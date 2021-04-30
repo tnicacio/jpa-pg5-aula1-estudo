@@ -15,17 +15,40 @@ public class EM {
     
     public static EntityManager getEntityManager() {
         try {
-          //Obtém o factory a partir da unidade de persistência.
-          emf = Persistence.createEntityManagerFactory("com.tnicacio_AulaJpaTads01PU");
-          //Cria um entity manager.
-          em = emf.createEntityManager();
-          //Fecha o factory para liberar os recursos utilizado.
-        } finally {
-            if (emf != null){
-                emf.close();
-            }
+          if (em == null || !emf.isOpen()) {
+            emf = Persistence.createEntityManagerFactory("com.tnicacio_AulaJpaTads01PU");
+            em = emf.createEntityManager();
+          }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         return em;
+    }
+    
+    
+    public static void closeEntityManager() {
+        try {
+            if (em != null && em.isOpen()){
+                em.close();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    public static void closeEntityManagerFactory() {
+        try {
+            if (emf != null && emf.isOpen()){
+                emf.close();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    public static void close() {
+        closeEntityManager();
+        closeEntityManagerFactory();
     }
     
 }

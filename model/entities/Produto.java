@@ -2,13 +2,12 @@ package com.tnicacio.aulajpatads01.model.entities;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -25,17 +24,17 @@ public class Produto implements Serializable{
     private Long idproduto;
     
     private String descricao;
-    private Long preco;
-    private Long estoque;
+    private Double preco;
+    private Double estoque;
     
-    @OneToOne(cascade = {CascadeType.ALL})
-    @JoinColumn(name="idcategoria", referencedColumnName = "idcategoria")
+    @ManyToOne
+    @JoinColumn(name="idcategoria")
     private Categoria categoria;
     
     public Produto(){
     }
 
-    public Produto(Long idproduto, String descricao, Long preco, Long estoque, Categoria categoria) {
+    public Produto(Long idproduto, String descricao, Double preco, Double estoque, Categoria categoria) {
         this.idproduto = idproduto;
         this.descricao = descricao;
         this.preco = preco;
@@ -59,19 +58,19 @@ public class Produto implements Serializable{
         this.descricao = descricao;
     }
 
-    public Long getPreco() {
+    public Double getPreco() {
         return preco;
     }
 
-    public void setPreco(Long preco) {
+    public void setPreco(Double preco) {
         this.preco = preco;
     }
 
-    public Long getEstoque() {
+    public Double getEstoque() {
         return estoque;
     }
 
-    public void setEstoque(Long estoque) {
+    public void setEstoque(Double estoque) {
         this.estoque = estoque;
     }
 
@@ -102,12 +101,7 @@ public class Produto implements Serializable{
             return false;
         }
         final Produto other = (Produto) obj;
-        if (!Objects.equals(this.idproduto, other.idproduto)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.idproduto, other.idproduto);
     }
-    
-    
     
 }

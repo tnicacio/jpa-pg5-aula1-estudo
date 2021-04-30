@@ -1,5 +1,6 @@
 package com.tnicacio.aulajpatads01.model.dao;
 
+import com.tnicacio.aulajpatads01.em.EM;
 import com.tnicacio.aulajpatads01.model.dao.impl.CategoriaDaoEM;
 import com.tnicacio.aulajpatads01.model.dao.impl.ProdutoDaoEM;
 
@@ -11,11 +12,11 @@ import com.tnicacio.aulajpatads01.model.dao.impl.ProdutoDaoEM;
 public class DaoFactory {
     
     public static CategoriaDAO createCategoriaDao(){
-        return new CategoriaDaoEM();
+        return new CategoriaDaoEM(EM.getEntityManager());
     }
 
     public static ProdutoDAO createProdutoDao(){
-         return new ProdutoDaoEM();
+         return new ProdutoDaoEM(EM.getEntityManager());
     }
     
 }

@@ -1,12 +1,14 @@
 package com.tnicacio.aulajpatads01.model.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -24,8 +26,8 @@ public class Categoria implements Serializable{
 
     private String descricao;
     
-    @OneToOne(mappedBy = "categoria")
-    private Produto produto;
+    @OneToMany(mappedBy = "categoria")
+    private final List<Produto> produtos = new ArrayList<>();
     
     public Categoria(){
     }
@@ -70,18 +72,11 @@ public class Categoria implements Serializable{
             return false;
         }
         final Categoria other = (Categoria) obj;
-        if (!Objects.equals(this.idcategoria, other.idcategoria)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.idcategoria, other.idcategoria);
     }
 
-    public Produto getProduto() {
-        return produto;
+    public List<Produto> getProdutos() {
+        return produtos;
     }
-
-//    public void setProduto(Produto produto) {
-//        this.produto = produto;
-//    }
 
 }

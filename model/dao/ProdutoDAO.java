@@ -11,10 +11,10 @@ public interface ProdutoDAO {
     
     void insert(Produto obj);
     void update(Produto obj);
-    void deleteById(Integer id);
-    Produto findById(Integer id);
+    void deleteById(Long id);
+    Produto findById(Long id);
     List<Produto> findByDescricao(String desc);
     List<Produto> findAll();
-    List<Produto> findByDescricaoAndIdCategoria(String desc, Integer idcategoria);
+    List<Produto> findByDescricaoAndIdCategoria(String desc, Long idcategoria);
 
 }

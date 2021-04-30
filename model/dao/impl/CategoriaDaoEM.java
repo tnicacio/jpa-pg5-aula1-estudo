@@ -1,12 +1,11 @@
 package com.tnicacio.aulajpatads01.model.dao.impl;
 
+import com.tnicacio.aulajpatads01.em.EM;
 import com.tnicacio.aulajpatads01.model.dao.CategoriaDAO;
 import com.tnicacio.aulajpatads01.model.entities.Categoria;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 /**
  *
@@ -14,15 +13,16 @@ import javax.persistence.Persistence;
  */
 public class CategoriaDaoEM implements CategoriaDAO {
     
-    EntityManagerFactory emf;
-    EntityManager em;
+    private EntityManager em;
+    
+    public CategoriaDaoEM(EntityManager em){
+        this.em = em;
+    }
 
     @Override
     public void insert(Categoria obj) {
         try {
-            emf = Persistence.createEntityManagerFactory("com.tnicacio_AulaJpaTads01PU");
-            em = emf.createEntityManager();
-            
+            em = EM.getEntityManager();
             em.getTransaction().begin();
             System.out.println("Inserindo categoria " + obj.getDescricao());
             em.persist(obj);
@@ -30,21 +30,19 @@ public class CategoriaDaoEM implements CategoriaDAO {
             System.out.println("Categoria inserida com sucesso!");
         } catch(Exception e) {
             System.out.println(e.getMessage());
-            if (em != null && em.getTransaction() != null) {
+            if (isActiveTransaction()) {
                 em.getTransaction().rollback();
                 System.out.println("Erro na inserção da Categoria. Realizado rollback...");
             }
         } finally {
-            closeEntityManagerAndFactory(em, emf);
+            EM.close();
         }
     }
 
     @Override
     public void update(Categoria obj) {
         try {
-            emf = Persistence.createEntityManagerFactory("com.tnicacio_AulaJpaTads01PU");
-            em = emf.createEntityManager();
-            
+            em = EM.getEntityManager();
             em.getTransaction().begin();
             System.out.println("Atualizando categoria " + obj.getIdcategoria());
             em.merge(obj);
@@ -53,12 +51,12 @@ public class CategoriaDaoEM implements CategoriaDAO {
 
         } catch(Exception e) {
             System.out.println(e.getMessage());
-            if (em != null && em.getTransaction() != null) {
+            if (isActiveTransaction()) {
                 em.getTransaction().rollback();
                 System.out.println("Erro na atualização da Categoria. Realizado rollback...");
             }
         } finally {
-            closeEntityManagerAndFactory(em, emf);
+            EM.close();
         }
     }
 
@@ -72,13 +70,11 @@ public class CategoriaDaoEM implements CategoriaDAO {
         }
 
         try {
-            emf = Persistence.createEntityManagerFactory("com.tnicacio_AulaJpaTads01PU");
-            em = emf.createEntityManager();
+            em = EM.getEntityManager();
             em.getTransaction().begin();
             
-            if (!emf.isOpen() && !em.isOpen()) {
-                emf = Persistence.createEntityManagerFactory("com.tnicacio_AulaJpaTads01PU");
-                em = emf.createEntityManager();
+            if (!em.isOpen()) {
+                em = EM.getEntityManager();
                 em.getTransaction().begin();
             }
             
@@ -93,12 +89,12 @@ public class CategoriaDaoEM implements CategoriaDAO {
 
         } catch(Exception e) {
             System.out.println(e.getMessage());
-            if (em != null && em.getTransaction() != null) {
+            if (isActiveTransaction()) {
                 em.getTransaction().rollback();
                 System.out.println("Erro na exclusão da Categoria. Realizado rollback...");
             }
         } finally {
-            closeEntityManagerAndFactory(em, emf);
+            EM.close();
         }
     }
 
@@ -106,9 +102,7 @@ public class CategoriaDaoEM implements CategoriaDAO {
     public Categoria findById(Long id) {
         Categoria categoria = null;
         try {
-            emf = Persistence.createEntityManagerFactory("com.tnicacio_AulaJpaTads01PU");
-            em = emf.createEntityManager();
-            
+            em = EM.getEntityManager();
             categoria = em.find(Categoria.class, id);
             System.out.println("Busca pela Categoria " + id + " finalizada");
 
@@ -116,7 +110,7 @@ public class CategoriaDaoEM implements CategoriaDAO {
             System.out.println("Erro na busca pela Categoria " + id);
             System.out.println(e.getMessage());
         } finally {
-            closeEntityManagerAndFactory(em, emf);
+            EM.close();
         }
         return categoria;
     }
@@ -124,16 +118,14 @@ public class CategoriaDaoEM implements CategoriaDAO {
     @Override
     public List<Categoria> findByDescricao(String desc) {
         List<Categoria> categorias = new ArrayList<>();
-        
-        if (desc == null || "".equals(desc.trim())) {
-            return categorias;
-        }
 
         try {
-            String descToUpperCase = "%" + desc.toUpperCase() + "%";
-            emf = Persistence.createEntityManagerFactory("com.tnicacio_AulaJpaTads01PU");
-            em = emf.createEntityManager();
+            String descToUpperCase = "";
+            if (desc != null && !"".equals(desc.trim())) {
+                descToUpperCase = "%" + desc.toUpperCase() + "%";
+            }
             
+            em = EM.getEntityManager();
             categorias = em.createQuery(
                 "SELECT c FROM Categoria c "
                 + "WHERE upper(c.descricao) LIKE upper(:desc) "
@@ -146,7 +138,7 @@ public class CategoriaDaoEM implements CategoriaDAO {
             System.out.println("Erro na busca pela Categoria de descrição '" + desc + "'");
             System.out.println(e.getMessage());
         } finally {
-            closeEntityManagerAndFactory(em, emf);
+            EM.close();
         }
         return categorias;        
     }
@@ -155,9 +147,7 @@ public class CategoriaDaoEM implements CategoriaDAO {
     public List<Categoria> findAll() {
         List<Categoria> categorias = new ArrayList<>();
         try {
-            emf = Persistence.createEntityManagerFactory("com.tnicacio_AulaJpaTads01PU");
-            em = emf.createEntityManager();
-            
+            em = EM.getEntityManager();
             categorias = em.createQuery(
                 "SELECT c FROM Categoria c "
                 + "ORDER BY c.descricao", Categoria.class)
@@ -168,17 +158,12 @@ public class CategoriaDaoEM implements CategoriaDAO {
             System.out.println("Erro na busca por todas as categorias");
             System.out.println(e.getMessage());
         } finally {
-            closeEntityManagerAndFactory(em, emf);
+            EM.close();
         }
         return categorias;  
     }
     
-    private void closeEntityManagerAndFactory(EntityManager em, EntityManagerFactory emf){
-        try {
-            em.close();
-            emf.close();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    private boolean isActiveTransaction(){
+        return em != null && em.getTransaction() != null && em.getTransaction().isActive();
     }
 }
